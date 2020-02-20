@@ -1,4 +1,4 @@
-const PERIOD = 10000
+const PERIOD = 60000
 const WAIT_AFTER_CLICK = 2000
 
 const getLoadsElements = () => Array.from(document.getElementsByClassName('grid-row ng-scope'))
