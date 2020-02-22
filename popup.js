@@ -3,12 +3,12 @@ const stopButton = document.getElementById('stop')
 const secondsInput = document.getElementById('seconds')
 const secondsText = document.getElementById('secondsText')
 
-const hideButton = button => {
-  button.style.display = "none"
+const hideElement = element => {
+  element.style.display = "none"
 }
 
-const showButton = button => {
-  button.style.display = "block"
+const showElement = element => {
+  element.style.display = "block"
 }
 
 const sendMessage = message => new Promise(resolve => {
@@ -23,28 +23,48 @@ const sendQuestion = (question, onResponse) => {
   })
 }
 
+const visibilityOnStart = () => {
+  hideElement(startButton)
+  hideElement(secondsInput)
+  hideElement(secondsText)
+
+  showElement(stopButton)
+}
+
+const visibilityOnStop = () => {
+  hideElement(stopButton)
+
+  showElement(startButton)
+  showElement(secondsInput)
+  showElement(secondsText)
+}
+
 startButton.onclick = () => {
   sendMessage({ command: 'start', seconds: Number(localStorage.seconds) })
-  hideButton(startButton)
-  showButton(stopButton)
+  visibilityOnStart()
 }
 
 stopButton.onclick = () => {
   sendMessage({ command: 'stop' })
-  hideButton(stopButton)
-  showButton(startButton)
+  visibilityOnStop()
 }
 
-secondsInput.onchange = ({ target: { value } }) => {
+const onSecondsInputChange = (value = secondsInput.value) => {
+  secondsInput.value = value
   localStorage.setItem('seconds', value)
-  secondsText.innerText = `${value} s`
+  secondsText.innerText = `Reload every: ${value} seconds` 
 }
+
+secondsInput.addEventListener('input', () => onSecondsInputChange())
 
 const seconds = Number(localStorage.getItem('seconds')) || 60
-secondsInput.value = seconds
-secondsText.innerText = `${seconds} s`
+onSecondsInputChange(seconds)
 
 ;(async () => {
   const isRunning = await sendMessage({ question: 'isRunning' })
-  hideButton(isRunning ? startButton : stopButton)
+  if (isRunning) {
+    visibilityOnStart()
+  } else {
+    visibilityOnStop()
+  }
 })()
