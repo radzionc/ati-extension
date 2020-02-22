@@ -24,7 +24,7 @@ const sendQuestion = (question, onResponse) => {
 }
 
 startButton.onclick = () => {
-  sendMessage({ command: 'start' })
+  sendMessage({ command: 'start', seconds: Number(localStorage.seconds) })
   hideButton(startButton)
   showButton(stopButton)
 }

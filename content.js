@@ -1,4 +1,3 @@
-const PERIOD = 60000
 const WAIT_AFTER_CLICK = 2000
 
 const getLoadsElements = () => Array.from(document.getElementsByClassName('grid-row ng-scope'))
@@ -42,16 +41,16 @@ const updateLoadsView = async (initialLoads) => {
   })
 }
 
-chrome.runtime.onMessage.addListener(async ({ command, question }, sender, sendResponse) => {
-  if (command === 'start') {
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  if (message.command === 'start') {
     await clickOnSearch()
     const initialLoads = getLoads()
-    intervalId = setInterval(updateLoadsView, PERIOD, initialLoads)
-  } else if (command === 'stop') {
+    intervalId = setInterval(updateLoadsView, message.seconds * 1000, initialLoads)
+  } else if (message.command === 'stop') {
     clearInterval(intervalId)
     intervalId = null
   }
-  if (question === 'isRunning') {
+  if (message.question === 'isRunning') {
     sendResponse(!!intervalId)
   }
 })
