@@ -9,29 +9,31 @@ const showButton = button => {
   button.style.display = "block"
 }
 
+const sendMessage = message => new Promise(resolve => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, message, resolve)
+  })
+})
+
 const sendQuestion = (question, onResponse) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, { question }, onResponse)
   })
 }
 
-sendQuestion('isRunning', isRunning => {
-  hideButton(isRunning ? startButton : stopButton)
-})
-
-const sendCommand = command => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, { command })
-  })
-}
-
 startButton.onclick = () => {
-  sendCommand('start')
+  sendMessage({ command: 'start' })
   hideButton(startButton)
   showButton(stopButton)
 }
 
 stopButton.onclick = () => {
-  sendCommand('stop')
+  sendMessage({ command: 'stop' })
   hideButton(stopButton)
+  showButton(startButton)
 }
+
+(async () => {
+  const isRunning = await sendMessage({ question: 'isRunning' })
+  hideButton(isRunning ? startButton : stopButton)
+})()

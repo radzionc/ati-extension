@@ -1,4 +1,4 @@
-const PERIOD = 60000
+const PERIOD = 10000
 const WAIT_AFTER_CLICK = 2000
 
 const getLoadsElements = () => Array.from(document.getElementsByClassName('grid-row ng-scope'))
@@ -14,34 +14,39 @@ const getLoadFromElement = element => {
   }
 }
 
+const sleep = m => new Promise(r => setTimeout(r, m))
+
 const getLoads = () => {
   const elements = getLoadsElements()
   return elements.map(getLoadFromElement)
 }
 
-const clickOnSearch = () => {
+const clickOnSearch = async () => {
   const searchButton = document.getElementsByClassName("search-form-button").item(0)
   searchButton.click()
+  await sleep(WAIT_AFTER_CLICK)
 }
 
 let intervalId = null
 
-chrome.runtime.onMessage.addListener(({ command, question }, sender, sendResponse) => {
+const updateLoadsView = async (initialLoads) => {
+  await clickOnSearch()
+  const elements = getLoadsElements()
+  
+  elements.forEach(element => {
+    const load = getLoadFromElement(element)
+    const same = initialLoads.find(il => il.price === load.price && il.id === load.id)
+    if (same) {
+      element.remove()
+    }
+  })
+}
+
+chrome.runtime.onMessage.addListener(async ({ command, question }, sender, sendResponse) => {
   if (command === 'start') {
     const initialLoads = getLoads()
-    intervalId = setInterval(() => {
-      clickOnSearch()
-      setTimeout(() => {
-        const elements = getLoadsElements()
-        elements.forEach(element => {
-          const load = getLoadFromElement(element)
-          const same = initialLoads.find(il => il.price === load.price && il.id === load.id)
-          if (same) {
-            element.remove()
-          }
-        })
-      }, WAIT_AFTER_CLICK)
-    }, PERIOD)
+    updateLoadsView(initialLoads)
+    intervalId = setInterval(updateLoadsView, PERIOD, initialLoads)
   } else if (command === 'stop') {
     clearInterval(intervalId)
   }
