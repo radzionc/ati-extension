@@ -13,6 +13,8 @@ const getLoadFromElement = element => {
   }
 }
 
+const areLoadsSame = (one, another) => one.price === another.price && one.id === another.id
+
 const sleep = m => new Promise(r => setTimeout(r, m))
 
 const getLoads = () => {
@@ -32,12 +34,13 @@ const updateLoadsView = async (initialLoads) => {
   await clickOnSearch()
   const elements = getLoadsElements()
   
-  elements.forEach(element => {
+  return elements.map((element) => {
     const load = getLoadFromElement(element)
-    const same = initialLoads.find(il => il.price === load.price && il.id === load.id)
+    const same = initialLoads.find(il => areLoadsSame(il, load))
     if (same) {
       element.remove()
     }
+    return load
   })
 }
 
