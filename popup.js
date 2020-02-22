@@ -35,5 +35,6 @@ stopButton.onclick = () => {
 
 (async () => {
   const isRunning = await sendMessage({ question: 'isRunning' })
+  console.log('is running: ', isRunning)
   hideButton(isRunning ? startButton : stopButton)
 })()
