@@ -2,19 +2,26 @@
 <html>
   <head>
     <style>
+      body {
+        display: flex;
+        flex-direction: column;
+      }
       button {
-        height: 40px;
         margin: 10px;
-        width: 120px;
+        padding: 10px;
+        height: 40px;
         border-radius: 5px;
         border: 1px solid black;
         cursor: pointer;
+        width: 120px;
       }
     </style>
   </head>
   <body>
     <button id="start">Start</button>
     <button id="stop">Stop</button>
+    <input type="range" id="seconds" min="0" max="600">
+    <p id="secondsText"></p>
     <script src="popup.js"></script>
   </body>
 </html>

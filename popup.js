@@ -1,5 +1,7 @@
 const startButton = document.getElementById('start')
 const stopButton = document.getElementById('stop')
+const secondsInput = document.getElementById('seconds')
+const secondsText = document.getElementById('secondsText')
 
 const hideButton = button => {
   button.style.display = "none"
@@ -33,8 +35,16 @@ stopButton.onclick = () => {
   showButton(startButton)
 }
 
-(async () => {
+secondsInput.onchange = ({ target: { value } }) => {
+  localStorage.setItem('seconds', value)
+  secondsText.innerText = `${value} s`
+}
+
+const seconds = Number(localStorage.getItem('seconds')) || 60
+secondsInput.value = seconds
+secondsText.innerText = `${seconds} s`
+
+;(async () => {
   const isRunning = await sendMessage({ question: 'isRunning' })
-  console.log('is running: ', isRunning)
   hideButton(isRunning ? startButton : stopButton)
 })()
